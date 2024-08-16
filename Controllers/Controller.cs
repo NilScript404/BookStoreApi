@@ -1,107 +1,148 @@
 using Microsoft.AspNetCore.Mvc;
 using BookStore.Models;
-using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace BookStore.Controllers
 {
-	[ApiController]
-	[Route("api/[controller]")]
-	public class BooksController : ControllerBase
-	{
-		private readonly BookStoreDbContext _context;
+    [ApiController]
+    [Route("api/[controller]")]
+    public class BooksController : ControllerBase
+    {
+        private readonly BookStoreDbContext _context;
 
-		public BooksController(BookStoreDbContext context)
-		{
-			_context = context;
-		}
+        public BooksController(BookStoreDbContext context)
+        {
+            _context = context;
+        }
 
-		// GET: api/Books
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
-		{
-			return await _context.Books
-				 .Include(b => b.Author)
-				 .Include(b => b.Genre)
-				 .ToListAsync();
-		}
+        // GET api/books
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+        {
+            try
+            {
+                var books = await _context.Books
+                    .Include(b => b.Author)
+                    .Include(b => b.Genres)
+                    .ToListAsync();
 
-		// GET: api/Books/5
-		[HttpGet("{id}")]
-		public async Task<ActionResult<Book>> GetBook(int id)
-		{
-			var book = await _context.Books
-				 .Include(b => b.Author)
-				 .Include(b => b.Genre)
-				 .FirstOrDefaultAsync(b => b.Id == id);
+                return Ok(books);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error retrieving books: " + ex.Message);
+            }
+        }
 
-			if (book == null)
-			{
-				return NotFound();
-			}
+        // GET api/books/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Book>> GetBook(int id)
+        {
+            try
+            {
+                var book = await _context.Books
+                    .Include(b => b.Author)
+                    .Include(b => b.Genres)
+                    .FirstOrDefaultAsync(b => b.Id == id);
 
-			return book;
-		}
+                if (book == null)
+                {
+                    return NotFound();
+                }
 
-		// POST: api/Books
-		[HttpPost]
-		public async Task<ActionResult<Book>> CreateBook(Book book)
-		{
-			_context.Books.Add(book);
-			await _context.SaveChangesAsync();
+                return Ok(book);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error retrieving book: " + ex.Message);
+            }
+        }
 
-			return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
-		}
+        // POST api/books
+        [HttpPost]
+        public async Task<ActionResult<Book>> CreateBook(Book book)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-		// PUT: api/Books/5
-		[HttpPut("{id}")]
-		public async Task<ActionResult> UpdateBook(int id, Book book)
-		{
-			if (id != book.Id)
-			{
-				return BadRequest();
-			}
+                _context.Books.Add(book);
+                await _context.SaveChangesAsync();
 
-			_context.Entry(book).State = EntityState.Modified;
+                return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(400, "Error creating book: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error creating book: " + ex.Message);
+            }
+        }
 
-			try
-			{
-				await _context.SaveChangesAsync();
-			}
-			catch (DbUpdateConcurrencyException)
-			{
-				if (!await BookExists(id))
-				{
-					return NotFound();
-				}
-				else
-				{
-					throw;
-				}
-			}
+        // PUT api/books/id
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateBook(int id, Book book)
+        {
+            try
+            {
+                if (id != book.Id)
+                {
+                    return BadRequest();
+                }
 
-			return NoContent();
-		}
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-		// DELETE: api/Books/5
-		[HttpDelete("{id}")]
-		public async Task<ActionResult> DeleteBook(int id)
-		{
-			var book = await _context.Books.FindAsync(id);
-			if (book == null)
-			{
-				return NotFound();
-			}
+                _context.Entry(book).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
 
-			_context.Books.Remove(book);
-			await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(400, "Error updating book: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error updating book: " + ex.Message);
+            }
+        }
 
-			return NoContent();
-		}
+        // DELETE api/books/id
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteBook(int id)
+        {
+            try
+            {
+                var book = await _context.Books
+                    .Include(b => b.Author)
+                    .Include(b => b.Genres)
+                    .FirstOrDefaultAsync(b => b.Id == id);
 
-		private async Task<bool> BookExists(int id)
-		{
-			return await _context.Books.AnyAsync(e => e.Id == id);
-		}
-	}
+                if (book == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Books.Remove(book);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error deleting book: " + ex.Message);
+            }
+        }
+    }
 }
