@@ -9,6 +9,7 @@ namespace BookStore.Models
         public string LastName { get; set; }
         public string Bio { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public ICollection<Book>? Books { get; set; }
+        
+        public ICollection<BookAuthor>? BookAuthors { get; set; }
     }
 }

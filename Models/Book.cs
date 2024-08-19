@@ -10,12 +10,15 @@ namespace BookStore.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
+       
         public int AuthorId { get; set; }
-        
         public Author? Author { get; set; }
+        
         public DateTime PublicationDate { get; set; }
         public decimal Price { get; set; }
         public int Rating { get; set; }
-        public ICollection<Genre> Genres { get; set; }
+        public ICollection<BookAuthor>? BookAuthors { get; set; }
+        
+        //public ICollection<Genre> Genres { get; set; }
     }
 }
