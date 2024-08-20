@@ -18,7 +18,5 @@ namespace BookStore.Models
         public decimal Price { get; set; }
         public int Rating { get; set; }
         public ICollection<BookAuthor>? BookAuthors { get; set; }
-        
-        //public ICollection<Genre> Genres { get; set; }
     }
 }
