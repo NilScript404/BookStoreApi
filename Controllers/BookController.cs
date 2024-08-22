@@ -57,7 +57,7 @@ namespace MyBookStore.Controllers
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
                 if (!_context.Books.Any(e => e.Id == id))
                 {
@@ -74,7 +74,12 @@ namespace MyBookStore.Controllers
         // POST: api/Books
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
-        {
+        {   
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
             
