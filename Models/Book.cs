@@ -13,7 +13,8 @@ namespace BookStore.Models
         public DateTime PublicationDate { get; set; }
         public decimal Price { get; set; }
         public int Rating { get; set; }
-       
-        public ICollection<BookAuthor>? BookAuthors { get; set; }
+        
+        public List<Author> Authors { get; set; } = [];
+        public List<BookAuthor> BookAuthors { get; set; } = [];
     }
 }
