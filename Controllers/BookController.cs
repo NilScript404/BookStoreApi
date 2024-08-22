@@ -40,10 +40,14 @@ namespace MyBookStore.Controllers
             
             return Ok(book);
         }
-
+        
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
             
@@ -77,16 +81,6 @@ namespace MyBookStore.Controllers
                 }
             }
             return NoContent();
-        }
-        
-        // POST: api/Books
-        [HttpPost]
-        public async Task<ActionResult<Book>> PostBook(Book book)
-        {
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
-            
-            return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
         }
         
         [HttpDelete("{id}")]
