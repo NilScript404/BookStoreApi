@@ -65,7 +65,7 @@ namespace MyBookStore.Controllers
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
                 if (!_context.Books.Any(e => e.Id == id))
                 {
