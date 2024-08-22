@@ -40,7 +40,15 @@ namespace MyBookStore.Controllers
             
             return Ok(book);
         }
-        
+
+        [HttpPost]
+        public async Task<ActionResult<Book>> PostBook(Book book)
+        {
+            _context.Books.Add(book);
+            await _context.SaveChangesAsync();
+            
+            return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+        }
         
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBook(int id, Book book)
@@ -74,12 +82,7 @@ namespace MyBookStore.Controllers
         // POST: api/Books
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
-        {   
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            
+        {
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
             
