@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
 using BookStore.Models;
 
-namespace MyBookStore.Controllers
+namespace BookStore.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -32,7 +32,7 @@ namespace MyBookStore.Controllers
             var book = await _context.Books
                 .Include(b => b.Authors)
                 .FirstOrDefaultAsync(b => b.Id == id);
-            
+                    
             if (book == null)
             {
                 return NotFound();
@@ -57,7 +57,10 @@ namespace MyBookStore.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBook(int id, Book book)
         {
-             
+            if (id != book.Id)
+            {
+                return BadRequest();
+            }    
             if (id != book.Id)
             {
                 return BadRequest();
@@ -82,7 +85,7 @@ namespace MyBookStore.Controllers
             }
             return NoContent();
         }
-        
+               
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {

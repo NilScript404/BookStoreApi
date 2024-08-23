@@ -16,5 +16,11 @@ namespace BookStore.Models
         
         public List<Author> Authors { get; set; } = [];
         public List<BookAuthor> BookAuthors { get; set; } = [];
+        
+/*         
+        public List<Genre> genres { get; set; } = [];
+        public List<BookGenre> bookGenres { get; set; } = [];
+*/        
+    
     }
 }
