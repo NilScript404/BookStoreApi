@@ -1,4 +1,4 @@
-/*namespace BookStore.Models;
+namespace BookStore.Models;
 
 public class Genre 
 {
@@ -7,4 +7,4 @@ public class Genre
 	
 	public List<Book> books { get; set; } = [];
 	public List<BookGenre> bookGenres { get; set; } = [];
-}*/
+}

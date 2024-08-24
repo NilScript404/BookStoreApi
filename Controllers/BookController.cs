@@ -21,6 +21,7 @@ namespace BookStore.Controllers
         {
             var books = await _context.Books
                 .Include(b => b.Authors)
+                .Include(g => g.Genres)
                 .ToListAsync();
             
             return Ok(books);
@@ -31,8 +32,9 @@ namespace BookStore.Controllers
         {
             var book = await _context.Books
                 .Include(b => b.Authors)
+                .Include(bg => bg.Genres)
                 .FirstOrDefaultAsync(b => b.Id == id);
-                    
+            
             if (book == null)
             {
                 return NotFound();
@@ -44,10 +46,13 @@ namespace BookStore.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
+            
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
+            
+            
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
             
@@ -60,13 +65,59 @@ namespace BookStore.Controllers
             if (id != book.Id)
             {
                 return BadRequest();
-            }    
-            if (id != book.Id)
-            {
-                return BadRequest();
             }
             
-            _context.Entry(book).State = EntityState.Modified;
+            var existingbook = await _context.Books
+                .Include(a => a.Authors)
+                .Include(bg => bg.Genres)
+                .FirstOrDefaultAsync(b => b.Id == id);
+                
+            if (existingbook == null)
+            {
+                return NotFound();
+            }
+            
+            if (!ModelState.IsValid) 
+            {
+                return BadRequest(ModelState);
+            }
+            
+            existingbook.Title = book.Title;
+            existingbook.Description = book.Description;
+            existingbook.PublicationDate = book.PublicationDate;
+            existingbook.Price = book.Price;
+            existingbook.Rating = book.Rating;
+            
+            
+            foreach (var genre in book.Genres)
+            {
+                var existinggenre = existingbook.Genres.FirstOrDefault(g => g.Name == genre.Name);
+                
+                if (existinggenre != null)
+                {
+                    existinggenre.Name = genre.Name;
+                }
+                else {
+                    existingbook.Genres.Add(genre);
+                }
+                
+            }
+            
+            foreach(var author in book.Authors)
+            {
+                var existingauthor = existingbook.Authors.FirstOrDefault(a => a.Id == author.Id);
+                
+                if (existingauthor != null)
+                {
+                    existingauthor.FirstName = author.FirstName;
+                    existingauthor.LastName = author.LastName;
+                    existingauthor.DateOfBirth = author.DateOfBirth;
+                }
+                else 
+                {
+                    existingbook.Authors.Add(author);
+                }
+            }
             
             try
             {
@@ -90,6 +141,7 @@ namespace BookStore.Controllers
         public async Task<IActionResult> DeleteBook(int id)
         {
             var book = await _context.Books.FindAsync(id);
+            
             if (book == null)
             {
                 return NotFound();
