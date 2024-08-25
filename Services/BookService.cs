@@ -38,7 +38,8 @@ namespace BookStore.BookService
 				{
 					FirstName = a.FirstName,
 					LastName = a.LastName,
-					DateOfBirth = a.DateOfBirth
+					DateOfBirth = a.DateOfBirth,
+					Bio = a.Bio
 				}).ToList(),
 				
 				GenreDtos = b.Genres.Select(g => new BookGenreDto
@@ -71,7 +72,8 @@ namespace BookStore.BookService
 				{
 					FirstName = a.FirstName,
 					LastName = a.LastName,
-					DateOfBirth = a.DateOfBirth
+					DateOfBirth = a.DateOfBirth,
+					Bio = a.Bio
 				}).ToList(),
 				
 				GenreDtos = book.Genres.Select(g => new BookGenreDto
@@ -96,7 +98,8 @@ namespace BookStore.BookService
 				{
 					FirstName = a.FirstName,
 					LastName = a.LastName,
-					DateOfBirth = a.DateOfBirth
+					DateOfBirth = a.DateOfBirth,
+					Bio = a.Bio
 				}).ToList(),
 				
 				Genres = bookDto.GenreDtos.Select(g => new Genre
@@ -119,7 +122,8 @@ namespace BookStore.BookService
 				{
 					FirstName = a.FirstName,
 					LastName = a.LastName,
-					DateOfBirth = a.DateOfBirth
+					DateOfBirth = a.DateOfBirth,
+					Bio = a.Bio
 				}).ToList(),
 				GenreDtos = book.Genres.Select(g => new BookGenreDto
 				{
@@ -172,6 +176,7 @@ namespace BookStore.BookService
 					existingauthor.FirstName = author.FirstName;
 					existingauthor.LastName = author.LastName;
 					existingauthor.DateOfBirth = author.DateOfBirth;
+					existingauthor.Bio = author.Bio;
 				}
 				else
 				{
@@ -179,7 +184,8 @@ namespace BookStore.BookService
 					{
 						FirstName = author.FirstName,
 						LastName = author.LastName,
-						DateOfBirth = author.DateOfBirth
+						DateOfBirth = author.DateOfBirth,
+						Bio = author.Bio
 					});
 				}
 			

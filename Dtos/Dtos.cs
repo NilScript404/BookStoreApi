@@ -4,7 +4,7 @@ namespace BookStore.Dto
 	{
 		public string Title { get; set; }
 		public string Description { get; set; }
-		public DateTime PublicationDate { get; set; }
+		public int PublicationDate { get; set; }
 		public decimal Price { get; set; }
 		public int Rating { get; set; }
 	
@@ -17,8 +17,9 @@ namespace BookStore.Dto
 	{
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
-		public DateTime DateOfBirth { get; set; }
-	
+		public string Bio { get; set; }
+		public int DateOfBirth { get; set; }
+
 	}
 	
 	public class BookGenreDto

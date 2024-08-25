@@ -10,7 +10,9 @@ namespace BookStore.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public DateTime PublicationDate { get; set; }
+        
+        [Range(1500 , 2024 , ErrorMessage = "Publication date must be value between 1500 and 2024")]
+        public int PublicationDate { get; set; }
         public decimal Price { get; set; }
         public int Rating { get; set; }
         
