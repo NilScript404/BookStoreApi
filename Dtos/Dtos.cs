@@ -7,6 +7,7 @@ namespace BookStore.Dto
 		public int PublicationDate { get; set; }
 		public decimal Price { get; set; }
 		public int Rating { get; set; }
+      public int Version { get; set; }
 	
 		public List<BookAuthorDto> AuthorDtos { get; set; }
 		public List<BookGenreDto> GenreDtos { get; set; }

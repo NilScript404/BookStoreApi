@@ -2,29 +2,23 @@ using BookStore.Data;
 using BookStore.Models;
 using BookStore.Dto;
 using Microsoft.EntityFrameworkCore;
+using BookStore.BookRepositoryService;
 
 namespace BookStore.BookService
 {
 	public class BookService : IBookService
 	{
-		private readonly BookStoreDbContext _context;
+		private readonly IBookRepository _repository;
 		
-		public BookService(BookStoreDbContext context)
+		public BookService(IBookRepository repository)
 		{
-			_context = context;
+			_repository = repository;
 		}
 		
 		public async Task<IEnumerable<BookDto>> GetBooksAsync()
 		{
-			var books = await _context.Books
-				.Include(b => b.Authors)
-				.Include(g => g.Genres)
-				.ToListAsync();
 			
-			if (books == null)
-			{
-				return null;
-			}
+			var books = await _repository.GetBooksAsync();
 			
 			return books.Select(b => new BookDto
 			{
@@ -33,6 +27,7 @@ namespace BookStore.BookService
 				PublicationDate = b.PublicationDate,
 				Price = b.Price,
 				Rating = b.Rating,
+				Version = b.Version,
 				
 				AuthorDtos = b.Authors.Select(a => new BookAuthorDto
 				{
@@ -49,12 +44,10 @@ namespace BookStore.BookService
 			});
 		}
 		
-		public async Task<BookDto> GetBookAsync(string Title)
+		public async Task<BookDto> GetBookAsync(string Title , decimal Version)
 		{
-			var book = await _context.Books
-				.Include(b => b.Authors)
-				.Include(g => g.Genres)
-				.FirstOrDefaultAsync(t => t.Title == Title);
+			
+			var book = await _repository.GetBookAsync(Title, Version);
 			
 			if (book == null)
 			{
@@ -68,6 +61,8 @@ namespace BookStore.BookService
 				PublicationDate = book.PublicationDate,
 				Price = book.Price,
 				Rating = book.Rating,
+				Version = book.Version,
+				
 				AuthorDtos = book.Authors.Select(a => new BookAuthorDto
 				{
 					FirstName = a.FirstName,
@@ -93,6 +88,7 @@ namespace BookStore.BookService
 				PublicationDate = bookDto.PublicationDate,
 				Price = bookDto.Price,
 				Rating = bookDto.Rating,
+				Version = bookDto.Version,
 				
 				Authors = bookDto.AuthorDtos.Select(a => new Author
 				{
@@ -108,8 +104,7 @@ namespace BookStore.BookService
 				}).ToList()
 			};
 			
-			_context.Books.Add(book);
-			await _context.SaveChangesAsync();
+			await _repository.AddBookAsync(book);
 			
 			return new BookDto
 			{
@@ -118,6 +113,8 @@ namespace BookStore.BookService
 				PublicationDate = book.PublicationDate,
 				Price = book.Price,
 				Rating = book.Rating,
+				Version = book.Version,
+				
 				AuthorDtos = book.Authors.Select(a => new BookAuthorDto
 				{
 					FirstName = a.FirstName,
@@ -132,23 +129,20 @@ namespace BookStore.BookService
 			};
 		}
 		
-		public async Task UpdateBookAsync(string Title, BookDto bookDto)
+		public async Task UpdateBookAsync(string Title , decimal Version , BookDto bookDto)
 		{
-			
-			var existingbook = await _context.Books
-			.Include(a => a.Authors)
-			.Include(g => g.Genres)
-			.FirstOrDefaultAsync(t => t.Title == Title);
-			
+			var existingbook = await _repository.GetBookAsync(Title, Version);
 			if (existingbook == null)
 			{
 				return;
 			}
+			
 			existingbook.Title = bookDto.Title;
 			existingbook.Description = bookDto.Description;
 			existingbook.PublicationDate = bookDto.PublicationDate;
 			existingbook.Price = bookDto.Price;
 			existingbook.Rating = bookDto.Rating;
+			existingbook.Version = bookDto.Version;
 			
 			foreach (var genre in bookDto.GenreDtos)
 			{
@@ -191,19 +185,18 @@ namespace BookStore.BookService
 			
 			}
 			
-			await _context.SaveChangesAsync();
+			await _repository.UpdateBookAsync(existingbook);
 		}
 		
-		public async Task DeleteBookAsync(string Title )
+		public async Task DeleteBookAsync(string Title , decimal Version )
 		{
-			var book = await _context.Books.FirstOrDefaultAsync(b => b.Title == Title);
+			var book = await _repository.GetBookAsync(Title, Version);
 			if (book == null)
 			{
 				return;
 			}
 			
-			_context.Books.Remove(book);
-			await _context.SaveChangesAsync();
+			await _repository.DeleteBookAsync(book);	
 		}
 	}
 }

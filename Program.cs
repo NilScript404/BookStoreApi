@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
 using System.Text.Json.Serialization;
 using BookStore.BookService;
+using BookStore.BookRepositoryService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,7 @@ builder.Services.AddControllers()
         });
 
 builder.Services.AddTransient<IBookService, BookService>();
-
+builder.Services.AddTransient<IBookRepository , BookRepository>();
 
 builder.Services.AddDbContext<BookStoreDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

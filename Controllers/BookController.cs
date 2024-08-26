@@ -20,20 +20,14 @@ namespace BookStore.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
         {   
-            try {
             var books = await _bookService.GetBooksAsync();
-            return books == null ? NotFound() : Ok(books);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return books.Any() ? Ok(books) : NotFound();
         }
         
-        [HttpGet("{Title}")]
-        public async Task<ActionResult<BookDto>> GetBook(string Title)
+        [HttpGet("{Title}/{Version:decimal}")]
+        public async Task<ActionResult<BookDto>> GetBook(string Title , decimal Version)
         {
-            var book = await _bookService.GetBookAsync(Title);
+            var book = await _bookService.GetBookAsync(Title , Version);
             return book == null ? NotFound() : Ok(book);
         }
         
@@ -44,51 +38,28 @@ namespace BookStore.Controllers
             {
                 return BadRequest(ModelState);
             }
-            try 
-            {
+            
             await _bookService.CreateBookAsync(book);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
             return Ok(book);
         }
         
-        [HttpPut("{Title}")]
-        public async Task<IActionResult> PutBook(string Title ,  BookDto bookDto)
+        [HttpPut("{Title}/{Version}")]
+        public async Task<IActionResult> PutBook(string Title, decimal Version , BookDto bookDto)
         {
-            
-            if (Title != bookDto.Title)
-            {
-                return BadRequest("The Book Was Not Found");
-            }
-            
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            try {
-            await _bookService.UpdateBookAsync(Title , bookDto);
+            
+            await _bookService.UpdateBookAsync(Title , Version , bookDto);
             return NoContent();
-            }
-            catch(Exception){
-                throw;
-            }
-        
         }
-               
-        [HttpDelete("{Title}")]
-        public async Task<IActionResult> DeleteBook(string Title)
+           
+        [HttpDelete("{Title}/{Version:decimal}")]
+        public async Task<IActionResult> DeleteBook(string Title , decimal Version)
         {
-            try {
-            await _bookService.DeleteBookAsync(Title);
+            await _bookService.DeleteBookAsync(Title , Version);
             return NoContent();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
         }
         
     }

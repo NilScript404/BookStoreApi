@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+/*using System.Text.Json.Serialization;
 using BookStore.Models;
 namespace BookStore.Models
 {
@@ -10,4 +10,4 @@ namespace BookStore.Models
 		public Book? Book { get; set; } = null!;
 		public Author? Author { get; set; } = null!;
 	}
-}
+}*/
