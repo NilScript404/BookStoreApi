@@ -10,7 +10,7 @@ namespace BookStore.Controllers;
 public class AuthorsController : ControllerBase
 {
 	private readonly BookStoreDbContext _context;
-
+	
 	public AuthorsController(BookStoreDbContext context)
 	{
 		_context = context;
