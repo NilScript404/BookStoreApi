@@ -3,6 +3,7 @@ using BookStore.Data;
 using System.Text.Json.Serialization;
 using BookStore.BookService;
 using BookStore.BookRepositoryService;
+using BookStore.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -11,40 +12,36 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<BookStoreDbContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-    };
-});
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("User", policy => policy.RequireRole("User"));
-});
-
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
         {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         });
+
+
+/* todo , could have also chained .AddDefaultTokenProviders() , for managing stuff like
+password reset , sing up notificiation , etc... 
+
+builder.Services.AddIdentity<User, Role>(
+    .AddEntityFrameworkStores<BookStoreDbContext>();
+    .AddDefaultTokenProviders()
+*/
+
+builder.Services.AddIdentity<User, Role>()
+    .AddEntityFrameworkStores<BookStoreDbContext>();
+    
+
+/* todo 
+builder.Services.AddIdentity<User , Role>( options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
+    }
+);
+*/
 
 builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<IBookRepository , BookRepository>();
@@ -59,6 +56,13 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var rolemanager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+    await SeedRole(rolemanager);
+}
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -68,6 +72,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
+// todo c
+// seed the db with admin and user 
+// then mess around with the authentication system 
+async Task SeedRole(RoleManager<Role> rolemanager)
+{
+    if (!await rolemanager.RoleExistsAsync("User"))
+    {
+        await rolemanager.CreateAsync(new Role { Name = "User" });
+    }
+    if (!await rolemanager.RoleExistsAsync("Admin"))
+    {
+        
+        await rolemanager.CreateAsync(new Role { Name = "Admin" });
+    }
+}
