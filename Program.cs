@@ -4,11 +4,7 @@ using System.Text.Json.Serialization;
 using BookStore.BookService;
 using BookStore.BookRepositoryService;
 using BookStore.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +16,7 @@ builder.Services.AddControllers()
 
 
 /* todo , could have also chained .AddDefaultTokenProviders() , for managing stuff like
-password reset , sing up notificiation , etc... 
+password reset , sign up notificiation , etc... 
 
 builder.Services.AddIdentity<User, Role>(
     .AddEntityFrameworkStores<BookStoreDbContext>();
@@ -28,8 +24,8 @@ builder.Services.AddIdentity<User, Role>(
 */
 
 builder.Services.AddIdentity<User, Role>()
-    .AddEntityFrameworkStores<BookStoreDbContext>();
-    
+    .AddEntityFrameworkStores<BookStoreDbContext>()
+    .AddDefaultTokenProviders();    
 
 /* todo 
 builder.Services.AddIdentity<User , Role>( options =>

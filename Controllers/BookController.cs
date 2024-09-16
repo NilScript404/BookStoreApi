@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using BookStore.Models;
 using BookStore.BookService;
 using BookStore.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookStore.Controllers
 {
@@ -17,7 +18,9 @@ namespace BookStore.Controllers
             _bookService = BookService;
         }
         
+        
         [HttpGet]
+        [Authorize(Roles = "User")]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
         {   
             var books = await _bookService.GetBooksAsync();

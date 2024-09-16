@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using BookStore.Models;
-
+using BookStore.Dto;
 namespace BookStore.Controllers
 {
 	
@@ -12,12 +12,12 @@ namespace BookStore.Controllers
 	public class AuthController : ControllerBase
 	{
 		private readonly UserManager<User> _usermanager;
-		private readonly RoleManager<Role> _rolemanager;
+		//	private readonly RoleManager<Role> _rolemanager;
 		
 		public AuthController(UserManager<User> usermanager , RoleManager<Role> rolemanager)
 		{
 			_usermanager = usermanager;
-			_rolemanager = rolemanager;
+		//	_rolemanager = rolemanager;
 		}
 		
 		[HttpPost("register")]
@@ -46,15 +46,4 @@ namespace BookStore.Controllers
 	
 	}
 	
-	public class RegisterModel 
-	{
-		public string Email { get; set; }
-		public string UserName { get; set; }
-		public string Password { get; set; }
-		public string FirstName { get; set; }
-		public string LastName { get; set; }
-		
-		// registermodel having a role is goofy , need to dive deeper tho
-		//public string Role { get; set; }
-	}
 }

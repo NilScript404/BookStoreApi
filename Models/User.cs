@@ -14,5 +14,5 @@ public class User : IdentityUser
 // really not needed in our case , just trying to showcase that we can extend the Identitrole
 public class Role : IdentityRole
 {
-	public string Info { get; set; }
+	public string? Info { get; set; }
 }
