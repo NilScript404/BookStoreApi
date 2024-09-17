@@ -18,9 +18,7 @@ namespace BookStore.Controllers
             _bookService = BookService;
         }
         
-        
         [HttpGet]
-        [Authorize(Roles = "User")]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
         {   
             var books = await _bookService.GetBooksAsync();
@@ -35,6 +33,7 @@ namespace BookStore.Controllers
         }
         
         [HttpPost]
+        [Authorize(Roles = "User")]
         public async Task<ActionResult<BookDto>> PostBook(BookDto book)
         {
             if (!ModelState.IsValid)
@@ -46,7 +45,9 @@ namespace BookStore.Controllers
             return Ok(book);
         }
         
+               
         [HttpPut("{Title}/{Version}")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> PutBook(string Title, decimal Version , BookDto bookDto)
         {
             if (!ModelState.IsValid)
@@ -59,6 +60,7 @@ namespace BookStore.Controllers
         }
            
         [HttpDelete("{Title}/{Version:decimal}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBook(string Title , decimal Version)
         {
             await _bookService.DeleteBookAsync(Title , Version);

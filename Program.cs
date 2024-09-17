@@ -14,31 +14,20 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         });
 
-
-/* todo , could have also chained .AddDefaultTokenProviders() , for managing stuff like
-password reset , sign up notificiation , etc... 
-
-builder.Services.AddIdentity<User, Role>(
-    .AddEntityFrameworkStores<BookStoreDbContext>();
-    .AddDefaultTokenProviders()
-*/
-
-builder.Services.AddIdentity<User, Role>()
-    .AddEntityFrameworkStores<BookStoreDbContext>()
-    .AddDefaultTokenProviders();    
-
-/* todo 
-builder.Services.AddIdentity<User , Role>( options =>
+builder.Services.AddIdentity<User, Role>(options =>
     {
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(90);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        
         options.Password.RequireDigit = true;
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = true;
         options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequiredLength = 6;
+        options.Password.RequiredLength = 8;
     }
-);
-*/
-
+).AddEntityFrameworkStores<BookStoreDbContext>()
+.AddDefaultTokenProviders();
+    
 builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<IBookRepository , BookRepository>();
 

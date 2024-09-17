@@ -14,15 +14,20 @@ namespace BookStore.Controllers
 		private readonly UserManager<User> _usermanager;
 		//	private readonly RoleManager<Role> _rolemanager;
 		
-		public AuthController(UserManager<User> usermanager , RoleManager<Role> rolemanager)
+		private readonly SignInManager<User> _signinmanager;
+		public AuthController(UserManager<User> usermanager , SignInManager<User> signinmanager)
 		{
 			_usermanager = usermanager;
-		//	_rolemanager = rolemanager;
+			//	_rolemanager = rolemanager;
+			_signinmanager = signinmanager;
 		}
 		
+		
+		// HttpPost
 		[HttpPost("register")]
 		public async Task<IActionResult> Register ([FromBody] RegisterModel model)
 		{
+			
 			var user = new User
 			{
 				UserName = model.UserName,
@@ -42,6 +47,40 @@ namespace BookStore.Controllers
 			
 			return BadRequest(result.Errors);
 			
+		}
+	
+		[HttpPost("Login")]
+		public async Task<IActionResult> Login([FromBody] LoginModel model)
+		{
+			var user = await _usermanager.FindByNameAsync(model.UserName);
+			if (user == null)
+			{
+				return Unauthorized("User Not Found");
+			}
+			
+			if (await _usermanager.IsLockedOutAsync(user))
+			{
+				return Forbid("Max Login Attempt reached , try again after 90 minutes");
+			}
+			
+			
+			var result = await _signinmanager.PasswordSignInAsync(model.UserName, model.Password, isPersistent: false, lockoutOnFailure: false);
+			if (result.Succeeded)
+			{
+				return Ok("Login Successful");
+			}
+			if (result.IsLockedOut)
+			{
+				return Forbid("Account has been Locked");
+			}
+			
+			return Unauthorized("Wrong Password or A Failed Login Attempt");
+		}
+		
+		[HttpPost("Logout")]
+		public async Task<IActionResult> Logout(){
+			await _signinmanager.SignOutAsync();
+			return Ok("Logged out successfully");
 		}
 	
 	}

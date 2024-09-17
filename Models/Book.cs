@@ -16,6 +16,7 @@ namespace BookStore.Models
         public int Rating { get; set; }
         public int Version { get; set; }
         
+        
         public List<Author> Authors { get; set; } = [];
         public List<Genre> Genres { get; set; } = [];
         
