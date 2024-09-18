@@ -44,7 +44,40 @@ namespace BookStore.BookService
 			});
 		}
 		
-		public async Task<BookDto> GetBookAsync(string Title , decimal Version)
+		public async Task<IEnumerable<BookDto>> GetUserBooksAsync(string userId)
+		{
+			var books = await _repository.GetBookByUserId(userId);
+			
+			if (books == null)
+			{
+				return null;
+			}
+			
+			return books.Select(b => new BookDto
+			{
+				Title = b.Title,
+				Description = b.Description,
+				PublicationDate = b.PublicationDate,
+				Price = b.Price,
+				Rating = b.Rating,
+				Version = b.Version,
+				
+				AuthorDtos = b.Authors.Select(a => new BookAuthorDto
+				{
+					FirstName = a.FirstName,
+					LastName = a.LastName,
+					DateOfBirth = a.DateOfBirth,
+					Bio = a.Bio
+				}).ToList(),
+				
+				GenreDtos = b.Genres.Select(g => new BookGenreDto
+				{
+					Name = g.Name
+				}).ToList()
+			});
+		}
+		
+		public async Task<BookDto> GetBookAsync(string Title, decimal Version)
 		{
 			
 			var book = await _repository.GetBookAsync(Title, Version);
@@ -78,17 +111,20 @@ namespace BookStore.BookService
 			};
 		}
 		
-		public async Task<BookDto> CreateBookAsync(BookDto bookDto)
+		public async Task<BookDto> CreateBookAsync(BookDto bookDto, string userId)
 		{
 			
 			var book = new Book
 			{
 				Title = bookDto.Title,
+				UserId = userId,
+				
 				Description = bookDto.Description,
 				PublicationDate = bookDto.PublicationDate,
 				Price = bookDto.Price,
 				Rating = bookDto.Rating,
 				Version = bookDto.Version,
+				
 				
 				Authors = bookDto.AuthorDtos.Select(a => new Author
 				{
@@ -114,7 +150,7 @@ namespace BookStore.BookService
 				Price = book.Price,
 				Rating = book.Rating,
 				Version = book.Version,
-				
+
 				AuthorDtos = book.Authors.Select(a => new BookAuthorDto
 				{
 					FirstName = a.FirstName,
@@ -128,26 +164,36 @@ namespace BookStore.BookService
 				}).ToList()
 			};
 		}
-		
-		public async Task UpdateBookAsync(string Title , decimal Version , BookDto bookDto)
+
+		public async Task<Book> UserGetBook(string Title, decimal Version)
+		{
+			var book = await _repository.GetBookAsync(Title, Version);
+			if (book == null)
+			{
+				return null;
+			}
+			return book;
+		}
+
+		public async Task UpdateBookAsync(string Title, decimal Version, BookDto bookDto)
 		{
 			var existingbook = await _repository.GetBookAsync(Title, Version);
 			if (existingbook == null)
 			{
 				return;
 			}
-			
+
 			existingbook.Title = bookDto.Title;
 			existingbook.Description = bookDto.Description;
 			existingbook.PublicationDate = bookDto.PublicationDate;
 			existingbook.Price = bookDto.Price;
 			existingbook.Rating = bookDto.Rating;
 			existingbook.Version = bookDto.Version;
-			
+
 			foreach (var genre in bookDto.GenreDtos)
 			{
 				var existinggenre = existingbook.Genres.FirstOrDefault(g => g.Name == genre.Name);
-				
+
 				// kidna useless ?
 				if (existinggenre != null)
 				{
@@ -158,13 +204,13 @@ namespace BookStore.BookService
 					existingbook.Genres.Add(new Genre { Name = genre.Name });
 				}
 			}
-			
+
 			foreach (var author in bookDto.AuthorDtos)
 			{
-				
+
 				var existingauthor = existingbook.Authors.FirstOrDefault
 					(a => a.FirstName + " " + a.LastName == author.FirstName + " " + author.LastName);
-				
+
 				if (existingauthor != null)
 				{
 					existingauthor.FirstName = author.FirstName;
@@ -182,21 +228,21 @@ namespace BookStore.BookService
 						Bio = author.Bio
 					});
 				}
-			
+
 			}
-			
+
 			await _repository.UpdateBookAsync(existingbook);
 		}
-		
-		public async Task DeleteBookAsync(string Title , decimal Version )
+
+		public async Task DeleteBookAsync(string Title, decimal Version)
 		{
 			var book = await _repository.GetBookAsync(Title, Version);
 			if (book == null)
 			{
 				return;
 			}
-			
-			await _repository.DeleteBookAsync(book);	
+
+			await _repository.DeleteBookAsync(book);
 		}
 	}
 }

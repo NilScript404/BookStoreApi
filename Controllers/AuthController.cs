@@ -6,26 +6,21 @@ using BookStore.Models;
 using BookStore.Dto;
 namespace BookStore.Controllers
 {
-	
+
 	[Route("api/[Controller]")]
 	[ApiController]
 	public class AuthController : ControllerBase
 	{
 		private readonly UserManager<User> _usermanager;
-		//	private readonly RoleManager<Role> _rolemanager;
-		
 		private readonly SignInManager<User> _signinmanager;
-		public AuthController(UserManager<User> usermanager , SignInManager<User> signinmanager)
+		public AuthController(UserManager<User> usermanager, SignInManager<User> signinmanager)
 		{
 			_usermanager = usermanager;
-			//	_rolemanager = rolemanager;
 			_signinmanager = signinmanager;
 		}
 		
-		
-		// HttpPost
 		[HttpPost("register")]
-		public async Task<IActionResult> Register ([FromBody] RegisterModel model)
+		public async Task<IActionResult> Register([FromBody] RegisterModel model)
 		{
 			
 			var user = new User
@@ -37,18 +32,17 @@ namespace BookStore.Controllers
 				Role = "User"
 			};
 			
-			var result = await _usermanager.CreateAsync(user , model.Password);
+			var result = await _usermanager.CreateAsync(user, model.Password);
 			if (result.Succeeded)
 			{
-				// the user model is added to the User Table , just an assumption tho
 				await _usermanager.AddToRoleAsync(user, "User");
 				return Ok("Registered!");
 			}
 			
 			return BadRequest(result.Errors);
-			
+		
 		}
-	
+		
 		[HttpPost("Login")]
 		public async Task<IActionResult> Login([FromBody] LoginModel model)
 		{
@@ -78,11 +72,12 @@ namespace BookStore.Controllers
 		}
 		
 		[HttpPost("Logout")]
-		public async Task<IActionResult> Logout(){
+		public async Task<IActionResult> Logout()
+		{
 			await _signinmanager.SignOutAsync();
 			return Ok("Logged out successfully");
 		}
 	
 	}
-	
+
 }

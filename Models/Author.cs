@@ -5,7 +5,6 @@ namespace BookStore.Models
 {
     public class Author
     {
-        
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -13,7 +12,5 @@ namespace BookStore.Models
         public int DateOfBirth { get; set; }
         
         public List<Book> Books { get; set; } = [];
-        // public List<BookAuthor> BookAuthors { get; set; } = [];
-    
     }
 }

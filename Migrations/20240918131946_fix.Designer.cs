@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStoreApi.Migrations
 {
     [DbContext(typeof(BookStoreDbContext))]
-    [Migration("20240915133421_fix13")]
-    partial class fix13
+    [Migration("20240918131946_fix")]
+    partial class fix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -108,10 +108,16 @@ namespace BookStoreApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Version")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Books");
                 });
@@ -140,10 +146,6 @@ namespace BookStoreApi.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Info")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -377,6 +379,17 @@ namespace BookStoreApi.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BookStore.Models.Book", b =>
+                {
+                    b.HasOne("BookStore.Models.User", "User")
+                        .WithMany("books")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("BookStore.Models.Role", null)
@@ -426,6 +439,11 @@ namespace BookStoreApi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BookStore.Models.User", b =>
+                {
+                    b.Navigation("books");
                 });
 #pragma warning restore 612, 618
         }

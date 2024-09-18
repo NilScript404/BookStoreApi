@@ -19,12 +19,12 @@ namespace BookStore.Dto
         public int Rating { get; set; }
         
         public int Version { get; set; }
-    
+        
         public List<BookAuthorDto> AuthorDtos { get; set; }
         public List<BookGenreDto> GenreDtos { get; set; }
     }
     
-    public class BookAuthorDto 
+    public class BookAuthorDto
     {
         [Required(ErrorMessage = "Author needs a firstname")]
         public string FirstName { get; set; }
@@ -42,14 +42,14 @@ namespace BookStore.Dto
         public string Name { get; set; }
     }
     // could easily be extended , and made more secure	
-    public class RegisterModel 
-	{
-		public string Email { get; set; }
-		public string UserName { get; set; }
-		public string Password { get; set; }
-		public string FirstName { get; set; }
-		public string LastName { get; set; }
-	}
+    public class RegisterModel
+    {
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
     
     public class LoginModel
     {
@@ -57,5 +57,5 @@ namespace BookStore.Dto
         public string Password { get; set; }
     }
 
-    
+
 }

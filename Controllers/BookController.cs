@@ -4,6 +4,7 @@ using BookStore.Models;
 using BookStore.BookService;
 using BookStore.Dto;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
@@ -20,15 +21,25 @@ namespace BookStore.Controllers
         
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
-        {   
+        {
             var books = await _bookService.GetBooksAsync();
             return books.Any() ? Ok(books) : NotFound();
         }
         
-        [HttpGet("{Title}/{Version:decimal}")]
-        public async Task<ActionResult<BookDto>> GetBook(string Title , decimal Version)
+        [HttpGet("UserBook")]
+        [Authorize(Roles = "User")]
+        public async  Task<ActionResult<IEnumerable<BookDto>>> GetUserBooks()
         {
-            var book = await _bookService.GetBookAsync(Title , Version);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            
+            var books = await _bookService.GetUserBooksAsync(userId);
+            return books == null ? NotFound("No Books") : Ok(books);
+        }
+        
+        [HttpGet("{Title}/{Version:decimal}")]
+        public async Task<ActionResult<BookDto>> GetBook(string Title, decimal Version)
+        {
+            var book = await _bookService.GetBookAsync(Title, Version);
             return book == null ? NotFound() : Ok(book);
         }
         
@@ -41,31 +52,49 @@ namespace BookStore.Controllers
                 return BadRequest(ModelState);
             }
             
-            await _bookService.CreateBookAsync(book);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            
+            await _bookService.CreateBookAsync(book, userId);
             return Ok(book);
         }
         
-               
+        
         [HttpPut("{Title}/{Version}")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> PutBook(string Title, decimal Version , BookDto bookDto)
+        public async Task<IActionResult> PutBook(string Title, decimal Version, BookDto bookDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             
-            await _bookService.UpdateBookAsync(Title , Version , bookDto);
-            return NoContent();
-        }
-           
-        [HttpDelete("{Title}/{Version:decimal}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteBook(string Title , decimal Version)
-        {
-            await _bookService.DeleteBookAsync(Title , Version);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            
+            var book = await _bookService.UserGetBook(Title, Version);
+            
+            if (book == null)
+            {
+                return NotFound("the book was not found");
+            }
+            if (book.UserId != userId)
+            {
+                return Unauthorized("You are not allowed to update this book");
+            }
+            
+            await _bookService.UpdateBookAsync(Title, Version, bookDto);
             return NoContent();
         }
         
+
+        // todo
+        // User should only be capable of deleting his own books
+        [HttpDelete("{Title}/{Version:decimal}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteBook(string Title, decimal Version)
+        {
+            await _bookService.DeleteBookAsync(Title, Version);
+            return NoContent();
+        }
+    
     }
 }

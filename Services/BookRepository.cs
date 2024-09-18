@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.BookRepositoryService
 {
-	public class BookRepository : IBookRepository 
+	public class BookRepository : IBookRepository
 	{
 		private readonly BookStoreDbContext _context;
 		
@@ -23,20 +23,29 @@ namespace BookStore.BookRepositoryService
 				.ToListAsync();
 		}
 		
-		public async Task<Book> GetBookAsync (string title , decimal version)
+		public async Task<Book> GetBookAsync(string title, decimal version)
 		{
 			return await _context.Books
 				.Include(a => a.Authors)
 				.Include(g => g.Genres)
 				.FirstOrDefaultAsync(b => b.Title == title && b.Version == version);
 		}
-	
+		
+		public async Task<IEnumerable<Book>> GetBookByUserId(string userId)
+		{
+			return await _context.Books
+				.Where(book => book.UserId == userId)
+				.Include(book => book.Authors)
+				.Include(book => book.Genres)
+				.ToListAsync();
+		}
+		
 		public async Task AddBookAsync(Book book)
 		{
 			_context.Books.Add(book);
 			await _context.SaveChangesAsync();
 		}
-	
+		
 		public async Task UpdateBookAsync(Book book)
 		{
 			_context.Books.Update(book);
