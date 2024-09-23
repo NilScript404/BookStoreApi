@@ -7,6 +7,7 @@ namespace BookStore.Dto
         [Required(ErrorMessage = "The Book Needs a Title")]
         [StringLength(50)]
         public string Title { get; set; }
+        
         public string Description { get; set; }
         
         [Range(1000, 2024, ErrorMessage = "The publication date must be between 1000 and 2024")]

@@ -12,6 +12,7 @@ namespace BookStore.Controllers
     [Route("api/[controller]")]
     public class BooksController : ControllerBase
     {
+        
         private readonly IBookService _bookService;
         
         public BooksController(IBookService BookService)
@@ -51,6 +52,28 @@ namespace BookStore.Controllers
             {
                 return BadRequest(ModelState);
             }
+            string tempgenre;
+            foreach(BookGenreDto temp in book.GenreDtos)
+            {
+                tempgenre = temp.Name; 
+            }
+            
+            // checking if genre exists in the list of genres
+            foreach(var temp in book.GenreDtos)
+            {
+                bool exist = false;
+                foreach(string genre in genres)
+                {
+                    if (temp.Name == genre)
+                    {
+                        exist = true;
+                        break;
+                    }
+                }
+                if (!exist){
+                    return BadRequest($"The Genre {temp} Doesnt Exist");
+                }
+            }
             
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             
@@ -85,7 +108,7 @@ namespace BookStore.Controllers
             return NoContent();
         }
         
-
+        
         // todo
         // User should only be capable of deleting his own books
         [HttpDelete("{Title}/{Version:decimal}")]
@@ -95,6 +118,29 @@ namespace BookStore.Controllers
             await _bookService.DeleteBookAsync(Title, Version);
             return NoContent();
         }
-    
+        
+        static List<string> genres = new List<string>
+        {
+            "Action",
+            "Adventure",
+            "Animation",
+            "Biography",
+            "Comedy",
+            "Crime",
+            "Documentary",
+            "Drama",
+            "Fantasy",
+            "Historical",
+            "Horror",
+            "Musical",
+            "Mystery",
+            "Romance",
+            "Sci-Fi",
+            "Sport",
+            "Thriller",
+            "War",
+            "Western",
+            "Family"
+        };   
     }
 }
