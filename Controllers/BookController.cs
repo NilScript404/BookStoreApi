@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BookStore.Models;
 using BookStore.BookService;
 using BookStore.Dto;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +10,6 @@ namespace BookStore.Controllers
     [Route("api/[controller]")]
     public class BooksController : ControllerBase
     {
-        
         private readonly IBookService _bookService;
         
         public BooksController(IBookService BookService)
@@ -24,7 +21,25 @@ namespace BookStore.Controllers
         public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
         {
             var books = await _bookService.GetBooksAsync();
-            return books.Any() ? Ok(books) : NotFound();
+            return books.Any() ? Ok(books) : BadRequest("No Book Was Found");
+        }
+        
+        // FromQuery throws badrequest if we dont write a genre => we dont need to check
+        // if genre is null or not
+        [HttpGet("SearchByGenre")]
+        public async Task<ActionResult<IEnumerable<BookDto>>> GetSearchedBooks([FromQuery] string genre)
+        {
+            foreach (var genretemp in genres)
+            {
+                if (genretemp == genre)
+                {
+                    var books = await _bookService.GetSearchedBooks(genre);
+                    return Ok(books);
+                } else {
+                    return BadRequest("a book with this genre doesnt exist");
+                }
+            }
+            return BadRequest();
         }
         
         [HttpGet("UserBook")]
@@ -34,7 +49,7 @@ namespace BookStore.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             
             var books = await _bookService.GetUserBooksAsync(userId);
-            return books == null ? NotFound("No Books") : Ok(books);
+            return books == null ? NotFound("The Specified Book Was Not Found") : Ok(books);
         }
         
         [HttpGet("{Title}/{Version:decimal}")]
@@ -112,11 +127,11 @@ namespace BookStore.Controllers
         // todo
         // User should only be capable of deleting his own books
         [HttpDelete("{Title}/{Version:decimal}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> DeleteBook(string Title, decimal Version)
         {
             await _bookService.DeleteBookAsync(Title, Version);
-            return NoContent();
+            return Ok("Book Was Succesfully Deleted");
         }
         
         static List<string> genres = new List<string>

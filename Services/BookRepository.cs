@@ -3,6 +3,7 @@ using BookStore.Dto;
 using BookStore.BookService;
 using BookStore.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace BookStore.BookRepositoryService
 {
@@ -40,6 +41,22 @@ namespace BookStore.BookRepositoryService
 				.ToListAsync();
 		}
 		
+		public async Task<IEnumerable<Book>> SearchByGenre(string genre)
+		{
+			/* add this error checking in the controller
+			
+			if (!string.IsNullOrEmpty(genre))
+			{
+				
+			}
+			*/
+			var query = await _context.Books
+				.Where(book => book.Genres.Any(g => g.Name.Contains(genre))).ToListAsync();
+			
+			return query;
+		}
+		
+		
 		public async Task AddBookAsync(Book book)
 		{
 			_context.Books.Add(book);
@@ -57,5 +74,6 @@ namespace BookStore.BookRepositoryService
 			_context.Books.Remove(book);
 			await _context.SaveChangesAsync();
 		}
+
 	}
 }

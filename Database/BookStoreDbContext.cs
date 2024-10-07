@@ -12,18 +12,10 @@ namespace BookStore.Data
 		public DbSet<Book> Books { get; set; }
 		public DbSet<Genre> Genres { get; set; }
 		
-		
+		//		
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
-			/* 
-			modelBuilder.Entity<Book>()
-				.HasOne(book => book.User)
-				.WithMany()
-				.HasForeignKey(b => b.UserId);
-			modelBuilder.Entity<User>()
-				.HasMany(u => u.books)
-				*/
 		}
 	}
 }

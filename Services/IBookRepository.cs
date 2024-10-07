@@ -1,4 +1,3 @@
-using BookStore.Data;
 using BookStore.Models;
 
 namespace BookStore.BookRepositoryService
@@ -11,5 +10,6 @@ namespace BookStore.BookRepositoryService
 		Task UpdateBookAsync(Book book);
 		Task DeleteBookAsync(Book book);
 		Task<IEnumerable<Book>> GetBookByUserId(string userId);
+		Task<IEnumerable<Book>> SearchByGenre(string genre);
 	}
 }

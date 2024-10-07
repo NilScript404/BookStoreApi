@@ -1,7 +1,5 @@
-using BookStore.Data;
 using BookStore.Models;
 using BookStore.Dto;
-using Microsoft.EntityFrameworkCore;
 using BookStore.BookRepositoryService;
 
 namespace BookStore.BookService
@@ -79,7 +77,6 @@ namespace BookStore.BookService
 		
 		public async Task<BookDto> GetBookAsync(string Title, decimal Version)
 		{
-			
 			var book = await _repository.GetBookAsync(Title, Version);
 			
 			if (book == null)
@@ -113,7 +110,6 @@ namespace BookStore.BookService
 		
 		public async Task<BookDto> CreateBookAsync(BookDto bookDto, string userId)
 		{
-			
 			var book = new Book
 			{
 				Title = bookDto.Title,
@@ -150,7 +146,7 @@ namespace BookStore.BookService
 				Price = book.Price,
 				Rating = book.Rating,
 				Version = book.Version,
-
+				
 				AuthorDtos = book.Authors.Select(a => new BookAuthorDto
 				{
 					FirstName = a.FirstName,
@@ -164,7 +160,7 @@ namespace BookStore.BookService
 				}).ToList()
 			};
 		}
-
+		
 		public async Task<Book> UserGetBook(string Title, decimal Version)
 		{
 			var book = await _repository.GetBookAsync(Title, Version);
@@ -174,7 +170,7 @@ namespace BookStore.BookService
 			}
 			return book;
 		}
-
+		
 		public async Task UpdateBookAsync(string Title, decimal Version, BookDto bookDto)
 		{
 			var existingbook = await _repository.GetBookAsync(Title, Version);
@@ -189,11 +185,11 @@ namespace BookStore.BookService
 			existingbook.Price = bookDto.Price;
 			existingbook.Rating = bookDto.Rating;
 			existingbook.Version = bookDto.Version;
-
+			
 			foreach (var genre in bookDto.GenreDtos)
 			{
 				var existinggenre = existingbook.Genres.FirstOrDefault(g => g.Name == genre.Name);
-
+				
 				// kidna useless ?
 				if (existinggenre != null)
 				{
@@ -204,13 +200,13 @@ namespace BookStore.BookService
 					existingbook.Genres.Add(new Genre { Name = genre.Name });
 				}
 			}
-
+			
 			foreach (var author in bookDto.AuthorDtos)
 			{
-
+				
 				var existingauthor = existingbook.Authors.FirstOrDefault
 					(a => a.FirstName + " " + a.LastName == author.FirstName + " " + author.LastName);
-
+				
 				if (existingauthor != null)
 				{
 					existingauthor.FirstName = author.FirstName;
@@ -228,12 +224,10 @@ namespace BookStore.BookService
 						Bio = author.Bio
 					});
 				}
-
 			}
-
 			await _repository.UpdateBookAsync(existingbook);
 		}
-
+		
 		public async Task DeleteBookAsync(string Title, decimal Version)
 		{
 			var book = await _repository.GetBookAsync(Title, Version);
@@ -241,8 +235,39 @@ namespace BookStore.BookService
 			{
 				return;
 			}
-
 			await _repository.DeleteBookAsync(book);
+		}
+		
+		public async Task<IEnumerable<BookDto>> GetSearchedBooks(string genre)
+		{
+			var books = await _repository.SearchByGenre(genre);
+			if (books == null)
+			{
+				return null;
+			}	
+			
+			return books.Select(b => new BookDto
+			{
+				Title = b.Title,
+				Description = b.Description,
+				PublicationDate = b.PublicationDate,
+				Price = b.Price,
+				Rating = b.Rating,
+				Version = b.Version,
+				
+				AuthorDtos = b.Authors.Select(a => new BookAuthorDto
+				{
+					FirstName = a.FirstName,
+					LastName = a.LastName,
+					DateOfBirth = a.DateOfBirth,
+					Bio = a.Bio
+				}).ToList(),
+				
+				GenreDtos = b.Genres.Select(g => new BookGenreDto
+				{
+					Name = g.Name
+				}).ToList()
+			});
 		}
 	}
 }
