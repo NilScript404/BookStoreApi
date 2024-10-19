@@ -47,13 +47,11 @@ namespace BookStore.BookRepositoryService
 			
 			if (!string.IsNullOrEmpty(genre))
 			{
-				
-			}
-			*/
-			var query = await _context.Books
-				.Where(book => book.Genres.Any(g => g.Name.Contains(genre))).ToListAsync();
 			
-			return query;
+			}*/
+			
+			var queries = await _context.Books.Where(book => book.Genres.Any(g => g.Name == genre)).ToListAsync();
+			return queries;
 		}
 		
 		
@@ -74,6 +72,5 @@ namespace BookStore.BookRepositoryService
 			_context.Books.Remove(book);
 			await _context.SaveChangesAsync();
 		}
-
 	}
 }

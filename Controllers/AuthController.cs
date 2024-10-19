@@ -6,7 +6,7 @@ using BookStore.Models;
 using BookStore.Dto;
 namespace BookStore.Controllers
 {
-
+	
 	[Route("api/[Controller]")]
 	[ApiController]
 	public class AuthController : ControllerBase

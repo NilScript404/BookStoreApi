@@ -15,7 +15,6 @@ namespace BookStore.BookService
 		
 		public async Task<IEnumerable<BookDto>> GetBooksAsync()
 		{
-			
 			var books = await _repository.GetBooksAsync();
 			
 			return books.Select(b => new BookDto
@@ -178,7 +177,7 @@ namespace BookStore.BookService
 			{
 				return;
 			}
-
+			
 			existingbook.Title = bookDto.Title;
 			existingbook.Description = bookDto.Description;
 			existingbook.PublicationDate = bookDto.PublicationDate;

@@ -13,7 +13,7 @@ namespace BookStore.Dto
         [Range(1000, 2024, ErrorMessage = "The publication date must be between 1000 and 2024")]
         public int PublicationDate { get; set; }
         
-        [Range(1, 20, ErrorMessage = "The Price should at least be 1$")]
+        [Range(1, 100, ErrorMessage = "The Price should at least be 1$ and 100$ at max")]
         public decimal Price { get; set; }
         
         [Range(1, 10, ErrorMessage = "The rating must be from 1 to 10")]
@@ -42,7 +42,7 @@ namespace BookStore.Dto
         [Required(ErrorMessage = "The Genre needs a name")]
         public string Name { get; set; }
     }
-    // could easily be extended , and made more secure	
+    // overrides the default scheme , can be further modified
     public class RegisterModel
     {
         public string Email { get; set; }
@@ -57,6 +57,4 @@ namespace BookStore.Dto
         public string UserName { get; set; }
         public string Password { get; set; }
     }
-
-
 }

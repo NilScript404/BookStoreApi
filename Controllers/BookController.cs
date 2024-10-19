@@ -21,7 +21,7 @@ namespace BookStore.Controllers
         public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
         {
             var books = await _bookService.GetBooksAsync();
-            return books.Any() ? Ok(books) : BadRequest("No Book Was Found");
+            return books.Any() ? Ok(books) : Ok("No Book Was Found");
         }
         
         // FromQuery throws badrequest if we dont write a genre => we dont need to check
@@ -29,17 +29,17 @@ namespace BookStore.Controllers
         [HttpGet("SearchByGenre")]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetSearchedBooks([FromQuery] string genre)
         {
+            // works only for a single genre , EX => Action
+            // Todo for multiple genres 
             foreach (var genretemp in genres)
             {
                 if (genretemp == genre)
                 {
                     var books = await _bookService.GetSearchedBooks(genre);
-                    return Ok(books);
-                } else {
-                    return BadRequest("a book with this genre doesnt exist");
+                    return Ok(books.Any() ? books : "No Book Exists with this Genre");
                 }
             }
-            return BadRequest();
+            return BadRequest("This Genre Doesnt Exist");
         }
         
         [HttpGet("UserBook")]
@@ -63,6 +63,13 @@ namespace BookStore.Controllers
         [Authorize(Roles = "User")]
         public async Task<ActionResult<BookDto>> PostBook(BookDto book)
         {
+            foreach(string genre in genres )
+            {
+                if (book.GenreDtos.Any(x => x.Name != genre)) {
+                    return BadRequest(genre + "is not a valid Genre");
+                }
+            }
+            
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -96,7 +103,6 @@ namespace BookStore.Controllers
             return Ok(book);
         }
         
-        
         [HttpPut("{Title}/{Version}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> PutBook(string Title, decimal Version, BookDto bookDto)
@@ -122,7 +128,6 @@ namespace BookStore.Controllers
             await _bookService.UpdateBookAsync(Title, Version, bookDto);
             return NoContent();
         }
-        
         
         // todo
         // User should only be capable of deleting his own books
