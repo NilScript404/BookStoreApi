@@ -43,16 +43,15 @@ namespace BookStore.BookRepositoryService
 		
 		public async Task<IEnumerable<Book>> SearchByGenre(string genre)
 		{
-			/* add this error checking in the controller
+			var queries = await _context.Books
+			.Where(book => book.Genres.Any(g => g.Name == genre))
+			.Include(book => book.Authors)
+			.Include(book => book.Genres)
+			.ToListAsync();
 			
-			if (!string.IsNullOrEmpty(genre))
-			{
-			
-			}*/
-			
-			var queries = await _context.Books.Where(book => book.Genres.Any(g => g.Name == genre)).ToListAsync();
 			return queries;
 		}
+		
 		
 		
 		public async Task AddBookAsync(Book book)

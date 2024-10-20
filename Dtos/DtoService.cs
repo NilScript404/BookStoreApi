@@ -1,83 +1,11 @@
 using BookStore.Models;
 using BookStore.Dto;
 using BookStore.BookRepositoryService;
-using BookStore.DtoService;
 
-namespace BookStore.BookService
+namespace BookStore.DtoService
 {
-	public class BookService : IBookService
+	class DtoService
 	{
-		private readonly IBookRepository _repository;
-		
-		public BookService(IBookRepository repository)
-		{
-			_repository = repository;
-		}
-		
-		public async Task<IEnumerable<BookDto>> GetBooksAsync()
-		{
-			var books = await _repository.GetBooksAsync();
-			return MapBooksToDto(books);
-		}
-		
-		public async Task<IEnumerable<BookDto>> GetUserBooksAsync(string userId)
-		{
-			var books = await _repository.GetBookByUserId(userId);
-			return books == null ? null : MapBooksToDto(books);
-		}
-		
-		public async Task<BookDto> GetBookAsync(string title, decimal version)
-		{
-			var book = await _repository.GetBookAsync(title, version);
-			return book == null ? null : MapSingleBookToDto(book);
-		}
-		
-		public async Task<BookDto> CreateBookAsync(BookDto bookDto, string userId)
-		{
-			var book = MapBookDtoToBook(bookDto);
-			// hardcoded , but who cares its a single line of code
-			book.UserId = userId;
-			
-			await _repository.AddBookAsync(book);
-			return MapSingleBookToDto(book);
-		}
-		
-		public async Task<Book> UserGetBook(string title, decimal version)
-		{
-			return await _repository.GetBookAsync(title, version);
-		}
-		
-		public async Task UpdateBookAsync(string title, decimal version, BookDto bookDto)
-		{
-			var existingBook = await _repository.GetBookAsync(title, version);
-			if (existingBook == null) return;
-			
-			var updatedBook = MapBookDtoToBook(bookDto, existingBook);
-			await _repository.UpdateBookAsync(updatedBook);
-		}
-		
-		public async Task DeleteBookAsync(string title, decimal version)
-		{
-			var book = await _repository.GetBookAsync(title, version);
-			if (book != null)
-			{
-				await _repository.DeleteBookAsync(book);
-			}
-		}
-		
-		public async Task<IEnumerable<BookDto>> GetSearchedBooks(string genre)
-		{
-			var books = await _repository.SearchByGenre(genre);
-			return books == null ? null : MapBooksToDto(books);
-		}
-		
-		private IEnumerable<BookDto> MapBooksToDto(IEnumerable<Book> books)
-		{
-			return books.Select(MapSingleBookToDto);
-		}
-		
-		// Helper function for converting a single Book , to a single BookDto
-		// could or maybe should write them in a seperate file
 		private BookDto MapSingleBookToDto(Book book)
 		{
 			return new BookDto
@@ -125,7 +53,7 @@ namespace BookStore.BookService
 				}).ToList()
 			};
 		}
-		
+
 		// Helper functions for updating the book		
 		private Book MapBookDtoToBook(BookDto bookDto, Book existingBook)
 		{
@@ -135,7 +63,7 @@ namespace BookStore.BookService
 			existingBook.Price = bookDto.Price;
 			existingBook.Rating = bookDto.Rating;
 			existingBook.Version = bookDto.Version;
-			
+
 			foreach (var genreDto in bookDto.GenreDtos)
 			{
 				if (!existingBook.Genres.Any(g => g.Name == genreDto.Name))

@@ -26,6 +26,8 @@ namespace BookStore.Controllers
         
         // FromQuery throws badrequest if we dont write a genre => we dont need to check
         // if genre is null or not
+        // Todo => upon returning books , the genre and the authors are empty => []
+        // need to fix the query in the bookservice probably
         [HttpGet("SearchByGenre")]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetSearchedBooks([FromQuery] string genre)
         {
