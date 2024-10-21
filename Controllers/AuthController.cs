@@ -4,9 +4,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using BookStore.Models;
 using BookStore.Dto;
+
 namespace BookStore.Controllers
 {
-	
 	[Route("api/[Controller]")]
 	[ApiController]
 	public class AuthController : ControllerBase
@@ -77,7 +77,5 @@ namespace BookStore.Controllers
 			await _signinmanager.SignOutAsync();
 			return Ok("Logged out successfully");
 		}
-	
 	}
-
 }

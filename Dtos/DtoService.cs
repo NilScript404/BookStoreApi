@@ -4,9 +4,12 @@ using BookStore.BookRepositoryService;
 
 namespace BookStore.DtoService
 {
-	class DtoService
+	class DtoService : IDtoService
 	{
-		private BookDto MapSingleBookToDto(Book book)
+		// converts a single Book to BookDto
+		// could also be used in a linq Operation , like Select , for converting many
+		// Book to BookDto
+		public BookDto MapBookToBookDto(Book book)
 		{
 			return new BookDto
 			{
@@ -30,7 +33,9 @@ namespace BookStore.DtoService
 			};
 		}
 		// Helper function for converting a single BookDto to a single book
-		private Book MapBookDtoToBook(BookDto bookDto)
+		// could also be used in a linq Operation , like Select , for converting many
+		// BookDto to Book
+		public Book MapBookDtoToBook(BookDto bookDto)
 		{
 			return new Book
 			{
@@ -53,9 +58,9 @@ namespace BookStore.DtoService
 				}).ToList()
 			};
 		}
-
+		
 		// Helper functions for updating the book		
-		private Book MapBookDtoToBook(BookDto bookDto, Book existingBook)
+		public Book MapBookDtoToBookUpdate(BookDto bookDto, Book existingBook)
 		{
 			existingBook.Title = bookDto.Title;
 			existingBook.Description = bookDto.Description;
@@ -63,7 +68,7 @@ namespace BookStore.DtoService
 			existingBook.Price = bookDto.Price;
 			existingBook.Rating = bookDto.Rating;
 			existingBook.Version = bookDto.Version;
-
+			
 			foreach (var genreDto in bookDto.GenreDtos)
 			{
 				if (!existingBook.Genres.Any(g => g.Name == genreDto.Name))
@@ -95,7 +100,6 @@ namespace BookStore.DtoService
 					});
 				}
 			}
-			
 			return existingBook;
 		}
 	}

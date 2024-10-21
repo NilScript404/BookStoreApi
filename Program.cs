@@ -1,6 +1,7 @@
-//  Todo => fix the Dto Service => in the Dto Folder , because we want to
-//  BookService From DtoService , BookService must look cleaner
-//  Refactor Even More , lots of Duplicated Code
+//
+// Todo => if the user isnt logged in , accessing restricted apis will result in error 404
+// which should not be the case and they should result in error 401 or 403 unauthorized
+//
 
 using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
@@ -8,6 +9,7 @@ using System.Text.Json.Serialization;
 using BookStore.BookService;
 using BookStore.BookRepositoryService;
 using BookStore.Models;
+using BookStore.DtoService;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,15 +33,14 @@ builder.Services.AddIdentity<User, Role>(options =>
     }
 ).AddEntityFrameworkStores<BookStoreDbContext>()
 .AddDefaultTokenProviders();
-    
+  
 builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<IBookRepository , BookRepository>();
+builder.Services.AddTransient<IDtoService, DtoService>();
 
 builder.Services.AddDbContext<BookStoreDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -51,8 +52,6 @@ using (var scope = app.Services.CreateScope())
     await SeedRole(rolemanager);
 }
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
