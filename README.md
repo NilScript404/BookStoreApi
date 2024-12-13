@@ -1,6 +1,6 @@
 # Bookstore API
 
-just a bookstore api project based on the latest .net core docs from microsoft. im trying to learn .NET Core and SQL fundamentals by building and expanding this project.
+just a bookstore api project based on the latest .net core docs from microsoft. im trying to learn .NET Core, SQL fundamentals, Design patterns and anything else that comes with building a semi large api.
 
 **Current Focus:**
 
